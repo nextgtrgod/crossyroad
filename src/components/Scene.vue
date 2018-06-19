@@ -5,7 +5,7 @@
 
 <script>
 import Events from '@/events'
-import Game from '@/modules/Game'
+import Render from '@/modules/render'
 
 export default {
 	name: 'Scene',
@@ -15,7 +15,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.game = new Game({
+		this.game = new Render({
 			view: this.$el
 		})
 	},
