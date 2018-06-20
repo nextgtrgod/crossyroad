@@ -8,15 +8,20 @@ import Map from '@/modules/map'
 export default class Render {
 	constructor({ view }) {
 
+		// remove this (only for pixel art / low res sprites)
+		PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST
+		//
+
 		this.app = new PIXI.Application({
 			view,
 			width: window.innerWidth,
 			height: window.innerHeight,
-			antialias: true,
+			antialias: false,
 			transparent: false,
-			forceCanvas: true,
+			forceCanvas: false,
+			roundPixels: false,
 		})
-		this.app.renderer.backgroundColor = 0x333333
+		this.app.renderer.backgroundColor = 0x242424
 		this.app.renderer.autoResize = true
 
 		this.app.ticker.add(this.update, this)
@@ -25,20 +30,21 @@ export default class Render {
 	}
 
 	load() {
-		let assets = {}
 
-		Object.keys(tiles).map(key => {
-			assets[key] = require(`@/assets/tiles/${tiles[key]}`)
-		})
+		let map = new Map()
 
-		PIXI.loader
-			.add(Object.values(assets))
-			.load(() => this.createMap(assets))
-	}
+		let gridSize = 64
 
-	createMap(assets) {
+		map.container.pivot.set(
+			gridSize * 4, gridSize * 5
+		)
+		map.container.position.set(window.innerWidth / 2, window.innerHeight / 2)
 
-		this.map = new Map(assets)
+		console.log(map.container.position)
+
+		this.app.stage.addChild(map.container)
+
+		map.preload()
 	}
 
 	update(delta) {

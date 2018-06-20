@@ -15,7 +15,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.game = new Render({
+		new Render({
 			view: this.$el
 		})
 	},
