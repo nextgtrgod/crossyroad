@@ -5,7 +5,7 @@
 
 <script>
 import Events from '@/events'
-import Render from '@/modules/render'
+import Render from '@/modules/Render'
 
 export default {
 	name: 'Scene',

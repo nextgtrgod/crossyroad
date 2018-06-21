@@ -1,15 +1,15 @@
 import * as PIXI from 'pixi.js'
 import * as TWEEN from 'es6-tween'
 
-import tiles from '@/data/tiles'
+import Map from '@/modules/Map'
+import Character from '@/modules/Character'
 
-import Map from '@/modules/map'
 
 export default class Render {
 	constructor({ view }) {
 
 		// remove this (only for pixel art / low res sprites)
-		PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST
+		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 		//
 
 		this.app = new PIXI.Application({
@@ -20,31 +20,45 @@ export default class Render {
 			transparent: false,
 			forceCanvas: false,
 			roundPixels: false,
+			powerPreference: 'high-performance',
 		})
 		this.app.renderer.backgroundColor = 0x242424
 		this.app.renderer.autoResize = true
 
 		this.app.ticker.add(this.update, this)
 
-		this.load()
+		this.container = new PIXI.Container()
+		this.app.stage.addChild(this.container)
+
+		this.init()
 	}
 
-	load() {
+	async init() {
+		this.start()
 
+		// map
 		let map = new Map()
+		await map.preload()
 
-		let gridSize = 64
+		this.container.addChild(map.container)
 
-		map.container.pivot.set(
-			gridSize * 4, gridSize * 5
+
+		// character
+		let character = new Character()
+		await character.preload()
+
+		console.log(character.container.width, character.container.height)
+
+		this.container.addChild(character.container)
+
+		
+		// center scene
+		this.container.pivot.set(
+			this.container.width / 2,
+			this.container.height,
 		)
-		map.container.position.set(window.innerWidth / 2, window.innerHeight / 2)
+		this.container.position.set(window.innerWidth / 2, window.innerHeight)
 
-		console.log(map.container.position)
-
-		this.app.stage.addChild(map.container)
-
-		map.preload()
 	}
 
 	update(delta) {
@@ -52,10 +66,10 @@ export default class Render {
 	}
 
 	start() {
-		this.ticker.start()
+		this.app.ticker.start()
 	}
 
 	stop() {
-		this.ticker.stop()
+		this.app.ticker.stop()
 	}
 }

@@ -7,6 +7,7 @@ const tiles = {
 	5: 'wall-4.jpg',
 	6: 'tile-2.jpg',
 	7: 'tile-3.jpg',
+	8: 'stairs-1.jpg',
 }
 
 export default tiles

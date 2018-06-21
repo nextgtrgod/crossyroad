@@ -20,6 +20,7 @@ export default {
 
 body {
 	background-color: #242424;
+	overflow: hidden; // temp
 }
 
 #app {
