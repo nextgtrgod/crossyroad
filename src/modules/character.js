@@ -6,6 +6,9 @@ import map from '@/data/map'
 import grid from '@/data/grid'
 import obstacles from '@/data/obstacles'
 
+let loaded = {}
+let assets = {}
+
 export default class Character {
 	constructor() {
 
@@ -33,6 +36,25 @@ export default class Character {
 		this.moveTime = 100
 	}
 
+	async preload() {
+		return new Promise((resolve, reject) => {
+
+			assets = {
+				up: require(`@/assets/character/moving/up/0.png`),
+				down: require(`@/assets/character/moving/down/0.png`),
+				left: require(`@/assets/character/moving/left/0.png`),
+				right: require(`@/assets/character/moving/right/0.png`),
+			}
+	
+			PIXI.loader
+				.add(Object.values(assets))
+				.load(() => {
+					resolve()
+					this.draw(assets)
+				})
+		})
+	}
+
 	move(nextPos) {
 
 		let pos = {
@@ -48,6 +70,15 @@ export default class Character {
 
 
 		this.position = pos
+		this.direction = nextPos.x
+			? (nextPos.x > 0)
+				? 'right'
+				: 'left'
+			: (nextPos.y > 0)
+				? 'down'
+				: 'up'
+
+		this.swapTexture()
 
 
 		new Tween({
@@ -66,28 +97,35 @@ export default class Character {
 
 	}
 
+	swapTexture(direction) {
+		let sprite = new PIXI.Sprite(PIXI.loader.resources[assets[this.direction]].texture)
+
+		sprite.pivot.set(
+			sprite.width / 2,
+			sprite.heigth / 2,
+		)
+
+		sprite.position.set(
+			grid.size / 2,
+			grid.size / 2
+		)
+
+		this.container.children = []
+
+		this.sprite = sprite
+
+		this.container.addChild(this.sprite)
+	}
+
 	stop() {
 		this.state = 'stop'
 	}
 
-	async preload() {
-		return new Promise((resolve, reject) => {
-			let assets = {
-				up: [
-					require(`@/assets/character/moving/up/0.png`)
-				]
-			}
-	
-			PIXI.loader
-				.add(require(`@/assets/character/moving/up/0.png`))
-				.load(() => {
-					resolve()
-					this.draw(assets)
-				})
-		})
-	}
-
 	draw(assets) {
+
+		Object.keys(assets).map(key => {
+			loaded[key] = new PIXI.Sprite(PIXI.loader.resources[assets[key]].texture)
+		})
 
 		let sprite = new PIXI.Sprite(PIXI.loader.resources[assets.up].texture)
 
@@ -97,25 +135,22 @@ export default class Character {
 		)
 
 		sprite.position.set(
-			32,
-			32
+			grid.size / 2,
+			grid.size / 2
 		)
 
-		// console.log(sprite.width)
+		this.sprite = sprite
 
-		this.container.addChild(sprite)
+		this.container.addChild(this.sprite)
 
 		this.container.pivot.set(
 			this.container.width / 2,
 			this.container.heigth / 2,
 		)
 
-		this.container.scale.set(
-			4, 4
-		)
+		this.container.scale.set(4, 4)
 
 		this.container.position.x = this.position.x * grid.size
 		this.container.position.y = this.position.y * grid.size
-
 	}
 }

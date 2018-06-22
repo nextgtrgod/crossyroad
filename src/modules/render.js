@@ -1,3 +1,5 @@
+import Events from '@/events'
+
 import * as PIXI from 'pixi.js'
 import * as TWEEN from 'es6-tween'
 
@@ -34,7 +36,6 @@ export default class Render {
 	}
 
 	async init() {
-		this.start()
 
 		// map
 		let map = new Map()
@@ -58,6 +59,9 @@ export default class Render {
 			this.container.height,
 		)
 		this.container.position.set(window.innerWidth / 2, window.innerHeight)
+
+		this.start()
+		Events.$emit('app-loaded')
 
 	}
 

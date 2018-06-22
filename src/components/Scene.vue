@@ -1,5 +1,5 @@
 <template>
-<canvas id="game"/>
+<canvas id="game" :class="{ loaded }"/>
 </template>
 
 
@@ -11,8 +11,11 @@ export default {
 	name: 'Scene',
 	data() {
 		return {
-
+			loaded: false,
 		}
+	},
+	created() {
+		Events.$on('app-loaded', () => this.loaded = true)
 	},
 	mounted() {
 		new Render({
@@ -25,6 +28,16 @@ export default {
 
 <style lang="less">
 @import '../styles/variables.less';
+
+
+#game {
+	opacity: 0;
+	transition: opacity .4s;
+	
+	&.loaded {
+		opacity: 1;
+	}
+}
 
 
 </style>
