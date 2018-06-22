@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { Tween } from 'es6-tween'
-import Key from '@/modules/key'
+import Key from '@/modules/Key'
+import Touch from '@/modules/Touch'
 
 import map from '@/data/map'
 import grid from '@/data/grid'
@@ -17,10 +18,16 @@ export default class Character {
 		this.controls = {};
 
 		this.controls = {
-			'up': 		new Key('up', () => this.move({ x: 0, y: -1 }), this.stop),
-			'down': 	new Key('down', () => this.move({ x: 0, y: 1 }), this.stop),
-			'left':		new Key('left', () => this.move({ x: -1, y: 0 }), this.stop),
-			'right': 	new Key('right', () => this.move({ x: 1, y: 0 }), this.stop),
+			up: 	new Key('up', () => this.move({ x: 0, y: -1 }), this.stop),
+			down: 	new Key('down', () => this.move({ x: 0, y: 1 }), this.stop),
+			left:	new Key('left', () => this.move({ x: -1, y: 0 }), this.stop),
+			right: 	new Key('right', () => this.move({ x: 1, y: 0 }), this.stop),
+			touch: 	new Touch({
+				up:	() => this.move({ x: 0, y: -1 }),
+				down: () => this.move({ x: 0, y: 1 }),
+				left: () => this.move({ x: -1, y: 0 }),
+				right: () => this.move({ x: 1, y: 0 }),
+			})
 		}
 
 		this.direction = 'up'
@@ -57,6 +64,19 @@ export default class Character {
 
 	move(nextPos) {
 
+		// rotate character
+
+		this.direction = nextPos.x
+			? (nextPos.x > 0)
+				? 'right'
+				: 'left'
+			: (nextPos.y > 0)
+				? 'down'
+				: 'up'
+		
+		this.swapTexture()
+
+
 		let pos = {
 			x: this.position.x + nextPos.x,
 			y: this.position.y + nextPos.y,			
@@ -68,18 +88,7 @@ export default class Character {
 		// collision (wall)
 		if (obstacles.indexOf(map[pos.y][pos.x]) > -1) return
 
-
 		this.position = pos
-		this.direction = nextPos.x
-			? (nextPos.x > 0)
-				? 'right'
-				: 'left'
-			: (nextPos.y > 0)
-				? 'down'
-				: 'up'
-
-		this.swapTexture()
-
 
 		new Tween({
 				x: this.container.x,
