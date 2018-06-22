@@ -47,7 +47,7 @@ export default class Render {
 		let character = new Character()
 		await character.preload()
 
-		console.log(character.container.width, character.container.height)
+		// console.log(character.container.width, character.container.height)
 
 		this.container.addChild(character.container)
 

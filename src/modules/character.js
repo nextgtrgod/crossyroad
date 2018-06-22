@@ -1,59 +1,73 @@
 import * as PIXI from 'pixi.js'
+import { Tween } from 'es6-tween'
 import Key from '@/modules/key'
+
+import map from '@/data/map'
+import grid from '@/data/grid'
+import obstacles from '@/data/obstacles'
 
 export default class Character {
 	constructor() {
 
 		this.container = new PIXI.Container()
 
-		this.controls = {}
+		this.controls = {};
 
-		;['up', 'right', 'down', 'left'].map(direction => {
-			this.controls[direction] = new Key(
-				direction,
-				() => this.move(direction),
-				() => this.stop(),
-			)
-		})
-		
-		console.log(this.controls)
+		this.controls = {
+			'up': 		new Key('up', () => this.move({ x: 0, y: -1 }), this.stop),
+			'down': 	new Key('down', () => this.move({ x: 0, y: 1 }), this.stop),
+			'left':		new Key('left', () => this.move({ x: -1, y: 0 }), this.stop),
+			'right': 	new Key('right', () => this.move({ x: 1, y: 0 }), this.stop),
+		}
 
 		this.direction = 'up'
 		this.state = 'idle' // 'idle', 'moving', 'death' (+ death options)
-	}
 
-	move(direction) {
-
-		this.state = 'moving'
-
-		switch (direction) {
-			case 'up':
-				this.container.position.y -= 64
-				break;
-
-			case 'right':
-				this.container.position.x += 64
-				break;
-
-			case 'down':
-				this.container.position.y += 64
-				break;
-			
-			case 'left':
-				this.container.position.x -= 64
-				break;
-		
-			default:
-				break;
+		// initial position
+		// first row center
+		this.position = {
+			x: map[0].length / 2, 
+			y: map.length - 1,
 		}
 
-		// this.position.set()
+		this.moveTime = 100
+	}
+
+	move(nextPos) {
+
+		let pos = {
+			x: this.position.x + nextPos.x,
+			y: this.position.y + nextPos.y,			
+		}
+
+		// out of map
+		if (map[pos.y] === undefined || map[pos.y][pos.x] === undefined) return
+
+		// collision (wall)
+		if (obstacles.indexOf(map[pos.y][pos.x]) > -1) return
+
+
+		this.position = pos
+
+
+		new Tween({
+				x: this.container.x,
+				y: this.container.y
+			})
+			.to({
+				x: this.container.x + grid.size * nextPos.x,
+				y: this.container.y + grid.size * nextPos.y,
+			}, this.moveTime)
+			.on('update', ({ x, y }) => {
+				this.container.x = x
+				this.container.y = y
+			})
+			.start()
+
 	}
 
 	stop() {
-
 		this.state = 'stop'
-
 	}
 
 	async preload() {
@@ -87,7 +101,7 @@ export default class Character {
 			32
 		)
 
-		console.log(sprite.width)
+		// console.log(sprite.width)
 
 		this.container.addChild(sprite)
 
@@ -99,6 +113,9 @@ export default class Character {
 		this.container.scale.set(
 			4, 4
 		)
+
+		this.container.position.x = this.position.x * grid.size
+		this.container.position.y = this.position.y * grid.size
 
 	}
 }

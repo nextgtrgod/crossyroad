@@ -4,7 +4,7 @@ export default class Key {
 	constructor(code, press, release, options) {
 
 		this.options = options || {
-			continuousPress: false,
+			infinitePress: false,
 			// ...
 		}
 
@@ -32,7 +32,7 @@ export default class Key {
 
 	downHandler = event => {
 
-		if (this.isDown && !this.options.continuousPress) return
+		if (this.isDown && !this.options.infinitePress) return
 
 		if (event.keyCode === this.code) {
 
