@@ -1,11 +1,13 @@
 import * as PIXI from 'pixi.js'
 import { Tween } from 'es6-tween'
+import Events from '@/events'
 import Key from '@/modules/Key'
 import Touch from '@/modules/Touch'
 
 import map from '@/data/map'
 import grid from '@/data/grid'
 import obstacles from '@/data/obstacles'
+import death from '@/data/death'
 
 let loaded = {}
 let assets = {}
@@ -18,10 +20,10 @@ export default class Character {
 		this.controls = {};
 
 		this.controls = {
-			up: 	new Key('up', () => this.move({ x: 0, y: -1 }), this.stop),
-			down: 	new Key('down', () => this.move({ x: 0, y: 1 }), this.stop),
-			left:	new Key('left', () => this.move({ x: -1, y: 0 }), this.stop),
-			right: 	new Key('right', () => this.move({ x: 1, y: 0 }), this.stop),
+			up: 	new Key('up', () => this.move({ x: 0, y: -1 }) ),
+			down: 	new Key('down', () => this.move({ x: 0, y: 1 }) ),
+			left:	new Key('left', () => this.move({ x: -1, y: 0 }) ),
+			right: 	new Key('right', () => this.move({ x: 1, y: 0 }) ),
 			touch: 	new Touch({
 				up:	() => this.move({ x: 0, y: -1 }),
 				down: () => this.move({ x: 0, y: 1 }),
@@ -64,6 +66,10 @@ export default class Character {
 
 	move(nextPos) {
 
+		if (this.state === 'moving') return
+
+		this.state = 'moving'
+
 		// rotate character
 
 		this.direction = nextPos.x
@@ -83,12 +89,20 @@ export default class Character {
 		}
 
 		// out of map
-		if (map[pos.y] === undefined || map[pos.y][pos.x] === undefined) return
+		if (map[pos.y] === undefined || map[pos.y][pos.x] === undefined) return this.setState('idle')
+
 
 		// collision (wall)
-		if (obstacles.indexOf(map[pos.y][pos.x]) > -1) return
+		if (obstacles.indexOf(map[pos.y][pos.x]) > -1) return this.setState('idle')
+
+
+		// death
+		if (death.indexOf(map[pos.y][pos.x]) > -1) this.setState('died')
+
 
 		this.position = pos
+		Events.$emit('character-pos', this.position)
+
 
 		new Tween({
 				x: this.container.x,
@@ -102,9 +116,20 @@ export default class Character {
 				this.container.x = x
 				this.container.y = y
 			})
+			.on('complete', () => {
+				if (this.state === 'died') {
+					Events.$emit('character-death', { type: 'pit' })
+
+					return
+				}
+
+				this.state = 'idle'
+			})
 			.start()
 
 	}
+
+	setState = state => this.state = state
 
 	swapTexture(direction) {
 		let sprite = new PIXI.Sprite(PIXI.loader.resources[assets[this.direction]].texture)
@@ -124,10 +149,6 @@ export default class Character {
 		this.sprite = sprite
 
 		this.container.addChild(this.sprite)
-	}
-
-	stop() {
-		this.state = 'stop'
 	}
 
 	draw(assets) {
