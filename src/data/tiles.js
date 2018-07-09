@@ -4,7 +4,7 @@ import { pixelRatio } from '@/config/index'
 // 	? '@2x'
 // 	: '@1x'
 
-const postfix = ''
+const postfix = '@2x'
 
 const tiles = {
 	0: `road_01${postfix}.png`,

@@ -54,17 +54,18 @@ export default class Render {
 			PIXI.loader.pre((res, next) => {
 				res.onComplete.add(function (r) {
 					if (r.extension === 'json') {
-						console.log(require('../assets/2x/' + r.data.meta.image))
 						r.data.meta.image = require('../assets/2x/' + r.data.meta.image)
 					}
 				})
 				next()
 			})
 
-			for (let a in assets.images) {
-				PIXI.loader.add(a, assets.images[a])
+			for (let key in assets.images) {
+				PIXI.loader.add(key, assets.images[key])
+				console.log(assets.images[key])
 			}
 
+			// sounds
 			// let format = 1 // ogg
 			// if (!PIXI.sound.utils.supported.ogg) format = 0 // aac
 			// if (PIXI.sound.utils.supported.mp3) format = 2 // mp3
