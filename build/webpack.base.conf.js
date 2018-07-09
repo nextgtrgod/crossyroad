@@ -31,6 +31,12 @@ module.exports = {
   },
   module: {
     rules: [
+			{
+				test: /\.json$/,
+				use: 'file-loader',
+				include: path.resolve(__dirname, '../src/assets/'),
+				exclude: /node_modules/
+			},
       {
         test: /\.vue$/,
         loader: 'vue-loader',

@@ -3,11 +3,14 @@ import { Tween } from 'es6-tween'
 import Events from '@/events'
 import Key from '@/modules/Key'
 import Touch from '@/modules/Touch'
+import Animator from '@/modules/Animator'
 
 import map from '@/data/map'
 import grid from '@/data/grid'
 import obstacles from '@/data/obstacles'
 import death from '@/data/death'
+
+import { cartToIso } from '@/utils/convert'
 
 let loaded = {}
 let assets = {}
@@ -16,6 +19,7 @@ export default class Character {
 	constructor() {
 
 		this.container = new PIXI.Container()
+		this.container.name = 'character'
 
 		this.controls = {};
 
@@ -38,8 +42,8 @@ export default class Character {
 		// initial position
 		// first row center
 		this.position = {
-			x: map[0].length / 2, 
-			y: map.length - 1,
+			x: 0,
+			y: 0,
 		}
 
 		this.moveTime = 100
@@ -49,10 +53,15 @@ export default class Character {
 		return new Promise((resolve, reject) => {
 
 			assets = {
-				up: require(`@/assets/character/moving/up/0.png`),
-				down: require(`@/assets/character/moving/down/0.png`),
-				left: require(`@/assets/character/moving/left/0.png`),
-				right: require(`@/assets/character/moving/right/0.png`),
+				// 'down_right': require(`@/assets/2x/character/moving/down_right.json`),
+				// 'left_down': require(`@/assets/2x/character/moving/left_down.json`),
+				// 'right_up': require(`@/assets/2x/character/moving/right_up.json`),
+				// 'up_left': require(`@/assets/2x/character/moving/up_left.json`),
+
+				// 'idle_up': require(`@/assets/2x/character/idle/idle_up.json`),
+				// 'idle_down': require(`@/assets/2x/character/idle/idle_down.json`),
+				// 'idle_left': require(`@/assets/2x/character/idle/idle_left.json`),
+				// 'idle_right': require(`@/assets/2x/character/idle/idle_right.json`),
 			}
 	
 			PIXI.loader
@@ -72,6 +81,8 @@ export default class Character {
 
 		// rotate character
 
+		let prevDirection = this.direction
+
 		this.direction = nextPos.x
 			? (nextPos.x > 0)
 				? 'right'
@@ -85,7 +96,7 @@ export default class Character {
 
 		let pos = {
 			x: this.position.x + nextPos.x,
-			y: this.position.y + nextPos.y,			
+			y: this.position.y + nextPos.y,
 		}
 
 		// out of map
@@ -102,15 +113,26 @@ export default class Character {
 
 		this.position = pos
 		Events.$emit('character-pos', this.position)
+		console.log(this.position)
+		
 
+		let newPos = cartToIso(
+			grid.size.y / 2 * nextPos.y,
+			grid.size.x / 2 * nextPos.x,
+		)
+
+		this.container.position.set(
+			this.container.x + newPos.x,
+			this.container.y + newPos.y,
+		)
 
 		new Tween({
 				x: this.container.x,
-				y: this.container.y
+				y: this.container.y,
 			})
 			.to({
-				x: this.container.x + grid.size * nextPos.x,
-				y: this.container.y + grid.size * nextPos.y,
+				x: this.container.x + newPos.x,
+				y: this.container.y + newPos.y,
 			}, this.moveTime)
 			.on('update', ({ x, y }) => {
 				this.container.x = x
@@ -126,7 +148,6 @@ export default class Character {
 				this.state = 'idle'
 			})
 			.start()
-
 	}
 
 	setState = state => this.state = state
@@ -134,15 +155,7 @@ export default class Character {
 	swapTexture(direction) {
 		let sprite = new PIXI.Sprite(PIXI.loader.resources[assets[this.direction]].texture)
 
-		sprite.pivot.set(
-			sprite.width / 2,
-			sprite.heigth / 2,
-		)
-
-		sprite.position.set(
-			grid.size / 2,
-			grid.size / 2
-		)
+		sprite.anchor.set(0, 1)
 
 		this.container.children = []
 
@@ -153,34 +166,58 @@ export default class Character {
 
 	draw(assets) {
 
-		Object.keys(assets).map(key => {
-			loaded[key] = new PIXI.Sprite(PIXI.loader.resources[assets[key]].texture)
-		})
+		console.log(PIXI.loader.resources)
 
-		let sprite = new PIXI.Sprite(PIXI.loader.resources[assets.up].texture)
+		this.animation = {
+			'down_right': new Animator({ name: 'down_right_00', json: assets['down_right'] }),
+			// 'left_down': new Animator({ name: 'left_down_00', loopStart: 81 }),
+			// 'right_up': new Animator({ name: 'right_up_00', loopStart: 27 }),
+			// 'up_left': new Animator({ name: 'up_left_00', loopStart: 54 }),
 
-		sprite.pivot.set(
-			sprite.width / 2,
-			sprite.heigth / 2,
+			// //temp
+			// 'up_down': new Animator({ name: 'up_left_00', loopStart: 54 }),
+
+
+			// // reverse
+			// 'right_down': new Animator({ name: 'down_right_00', speed: -1 }),
+			// 'down_left': new Animator({ name: 'left_down_00', loopStart: 81, speed: -1 }),
+			// 'up_right': new Animator({ name: 'right_up_00', loopStart: 27, speed: -1 }),
+			// 'left_up': new Animator({ name: 'up_left_00', loopStart: 54, speed: -1 }),
+
+			// //temp
+			// 'down_up': new Animator({ name: 'up_left_00', loopStart: 54, speed: -1 }),
+
+			// // idle
+			// // ...
+			// // temp
+			// 'idle_up': new Animator({ name: 'right_up_00', loopStart: 27 }),
+			// 'idle_down': new Animator({ name: 'left_down_00', loopStart: 81 }),
+			// 'idle_left': new Animator({ name: 'up_left_00', loopStart: 54 }),		
+			// 'idle_right': new Animator({ name: 'down_right_00' }),
+		}
+
+		this.animation['down_right'].play()
+		this.container.addChild(this.animation['down_right'])
+
+		// Object.keys(assets).map(key => {
+		// 	loaded[key] = new PIXI.Sprite(PIXI.loader.resources[assets[key]].texture)
+		// })
+
+		// let sprite = new PIXI.Sprite(PIXI.loader.resources[assets.up].texture)
+
+		// sprite.anchor.set(0, 1)
+
+
+		// this.sprite = sprite
+
+		// this.container.addChild(this.sprite)
+
+		let pos = cartToIso(
+			this.position.x * grid.size.x,
+			this.position.y * grid.size.y,
 		)
 
-		sprite.position.set(
-			grid.size / 2,
-			grid.size / 2
-		)
-
-		this.sprite = sprite
-
-		this.container.addChild(this.sprite)
-
-		this.container.pivot.set(
-			this.container.width / 2,
-			this.container.heigth / 2,
-		)
-
-		this.container.scale.set(4, 4)
-
-		this.container.position.x = this.position.x * grid.size
-		this.container.position.y = this.position.y * grid.size
+		this.container.x = pos.x
+		this.container.y = pos.y
 	}
 }

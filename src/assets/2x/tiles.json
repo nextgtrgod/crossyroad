@@ -1,0 +1,66 @@
+{"frames": {
+
+"grass_01.png":
+{
+	"frame": {"x":803,"y":107,"w":200,"h":101},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":99,"w":200,"h":101},
+	"sourceSize": {"w":200,"h":200},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"railway_01.png":
+{
+	"frame": {"x":605,"y":1,"w":196,"h":108},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":92,"w":196,"h":108},
+	"sourceSize": {"w":200,"h":200},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"road_01.png":
+{
+	"frame": {"x":403,"y":121,"w":200,"h":111},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":89,"w":200,"h":111},
+	"sourceSize": {"w":200,"h":200},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"road_02.png":
+{
+	"frame": {"x":1,"y":1,"w":400,"h":237},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":163,"w":400,"h":237},
+	"sourceSize": {"w":400,"h":400},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"water_01.png":
+{
+	"frame": {"x":803,"y":1,"w":200,"h":104},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":96,"w":200,"h":104},
+	"sourceSize": {"w":200,"h":200},
+	"pivot": {"x":0.5,"y":0.5}
+},
+"water_02.png":
+{
+	"frame": {"x":403,"y":1,"w":200,"h":118},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":82,"w":200,"h":118},
+	"sourceSize": {"w":200,"h":200},
+	"pivot": {"x":0.5,"y":0.5}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "tiles@2x.png",
+	"format": "RGBA8888",
+	"size": {"w":1004,"h":239},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:bf98adfeb1d60ef0398c1de0fd530a81:6e3cda1e6e37b85885211ccd363b0e59:7ae7e8fb03a82da5352d0c069c3b7659$"
+}
+}

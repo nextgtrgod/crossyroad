@@ -38,7 +38,7 @@ export default class Camera {
 
 			// this.world.pivot.set(
 			// 	this.world.width / 2,
-			// 	y * grid.size,
+			// 	y * grid.size.y,
 			// )
 
 			// this.world.position.set(
@@ -54,7 +54,7 @@ export default class Camera {
 			// 	})
 			// 	.to({
 			// 		pivotX: this.world.width / 2,
-			// 		pivotY: y * grid.size,
+			// 		pivotY: y * grid.size.y,
 			// 		posX: window.innerWidth / 2,
 			// 		posY: window.innerHeight / 2,
 			// 	}, 100)
@@ -97,7 +97,7 @@ export default class Camera {
 	}
 
 	pan() {
-		let charPos = map.length * grid.size - this.character.container.y
+		let charPos = map.length * grid.size.y - this.character.container.y
 		let cameraPos = this.world.position.y - window.innerHeight / 2
 
 		if (this.world.position.y - window.innerHeight > charPos) {

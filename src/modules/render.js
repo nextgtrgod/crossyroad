@@ -5,28 +5,30 @@ import * as TWEEN from 'es6-tween'
 
 import Map from '@/modules/Map'
 import Character from '@/modules/Character'
-import Camera from '@/modules/Camera'
+// import Camera from '@/modules/Camera'
 
+import { assets, pixelRatio } from '@/config/index'
 
 export default class Render {
 	constructor({ view }) {
 
 		// keep this only for pixel art / low res sprites
-		PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
+		// PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST
 		//
 
 		this.app = new PIXI.Application({
 			view,
 			width: window.innerWidth,
 			height: window.innerHeight,
-			antialias: false,
+			antialias: true,
 			transparent: false,
-			forceCanvas: false,
+			forceCanvas: true,
 			roundPixels: false,
 			powerPreference: 'high-performance',
+			autoResize: true,
+			resolution: pixelRatio,
+			backgroundColor: 0xffffff,
 		})
-		this.app.renderer.backgroundColor = 0x242424
-		this.app.renderer.autoResize = true
 
 
 		this.container = new PIXI.Container()
@@ -43,27 +45,73 @@ export default class Render {
 		})
 	}
 
+	preload() {
+		return new Promise(async (resolve) => {
+			if (this.loaded) {
+				return resolve()
+			}
+
+			PIXI.loader.pre((res, next) => {
+				res.onComplete.add(function (r) {
+					if (r.extension === 'json') {
+						// console.log(require('../assets/2x/' + r.data.meta.image))
+						r.data.meta.image = require('../assets/2x/' + r.data.meta.image)
+					}
+				})
+				next()
+			})
+
+			for (let a in assets.images) {
+				PIXI.loader.add(a, assets.images[a])
+			}
+
+			// let format = 1 // ogg
+			// if (!PIXI.sound.utils.supported.ogg) format = 0 // aac
+			// if (PIXI.sound.utils.supported.mp3) format = 2 // mp3
+			// for (let s of Object.keys(Assets.sounds)) {
+			// 	try {
+			// 		Sounds[s] = await this.preloadSound(Assets.sounds[s][format])
+			// 	} catch (e) {
+			// 		if (e) this.noSound = true
+			// 	}
+			// }
+
+			PIXI.loader.load((loader, resources) => {
+
+				this.loaded = true
+				this.resources = resources
+
+				resolve()
+			})
+
+		})
+	}
+
 	async init() {
+
+		await this.preload()
+		Events.$emit('app-loaded')
 
 		// map
 		this.map = new Map()
-		await this.map.preload()
-
 		this.container.addChild(this.map.container)
-
 
 		// character
 		this.character = new Character()
-		await this.character.preload()
-
 		this.container.addChild(this.character.container)
 
 
 		// camera
-		this.camera = new Camera({
-			world: this.container,
-			character: this.character,
-		})
+		// this.camera = new Camera({
+		// 	world: this.container,
+		// 	character: this.character,
+		// })
+
+
+		this.container.position.set(
+			300,
+			100
+		)
 
 
 		this.app.ticker.add(this.update, this)
@@ -75,7 +123,7 @@ export default class Render {
 	update(delta) {
 		TWEEN.update()
 
-		this.camera.update()
+		// this.camera.update()
 	}
 
 	start() {

@@ -4,51 +4,42 @@ import tiles from '@/data/tiles'
 import map from '@/data/map'
 
 import grid from '@/data/grid'
+import { pixelRatio, assetsFolder } from '@/config/index'
+import { cartToIso } from '@/utils/convert'
 
 export default class Map {
 	constructor() {
 
 		this.container = new PIXI.Container()
+		this.container.name = 'map'
 
+		this.draw()
 	}
 
-	async preload() {
-		return new Promise((resolve, reject) => {
-			let assets = {}
+	draw() {
 
-			// ?
-			let t = tiles
-	
-			// resolve path
-			Object.keys(t).map(key => {
-				assets[key] = require(`@/assets/tiles/${t[key]}`)
-			})
-	
-			// loading resources
-			PIXI.loader
-				.add(Object.values(assets))
-				.load(() => {
-					resolve()
-					this.draw(assets)
-				})
-		})
-	}
-
-	draw(assets) {
+		console.log(PIXI.loader.resources)
+		console.log(tiles)
 
 		// drawing map (level 0)
 		for (let i = map.length - 1; i >= 0; i--) {
+			// console.log(i + ' row')
 			for (let j = 0; j < map[i].length; j++) {
-				
-				let sprite = new PIXI.Sprite(PIXI.loader.resources[assets[map[i][j]]].texture)
 
-				sprite.scale.set(
-					grid.size / sprite.width,
-					grid.size / sprite.height
-				)
+				let sprite = new PIXI.Sprite(PIXI.loader.resources['tiles'].textures[ tiles[ map[i][j] ] ])
+				sprite.name = `${i}-${j}`
 
-				sprite.position.x = j * grid.size
-				sprite.position.y = i * grid.size
+				sprite.anchor.set(0, 1)
+
+				let x = j * grid.size.x
+				let y = i * grid.size.y
+
+				let coords = cartToIso(i * grid.size.x, j * grid.size.y)
+
+				// console.log(x, y, coords)
+
+				sprite.position.x = coords.x
+				sprite.position.y = coords.y
 
 				this.container.addChild(sprite)
 			}
