@@ -10,7 +10,7 @@ const assets = {
 		'left_down': require(`@/assets/2x/left_down.json`),
 		'right_up': require(`@/assets/2x/right_up.json`),
 		'up_left': require(`@/assets/2x/up_left.json`),
-		'tiles': require(`@/assets/2x/tiles.json`),
+		'tiles': require(`@/assets/2x/tiles@2x.json`),
 	},
 	sounds: {
 

@@ -54,7 +54,7 @@ export default class Render {
 			PIXI.loader.pre((res, next) => {
 				res.onComplete.add(function (r) {
 					if (r.extension === 'json') {
-						// console.log(require('../assets/2x/' + r.data.meta.image))
+						console.log(require('../assets/2x/' + r.data.meta.image))
 						r.data.meta.image = require('../assets/2x/' + r.data.meta.image)
 					}
 				})
