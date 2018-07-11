@@ -63,7 +63,6 @@ export default class Render {
 
 			for (let key in assets.images) {
 				PIXI.loader.add(key, assets.images[key])
-				console.log(assets.images[key])
 			}
 
 			// sounds

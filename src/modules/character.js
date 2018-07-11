@@ -97,7 +97,7 @@ export default class Character {
 			if (death.includes(+tileIndex)) this.setState('died')
 		})
 
-		if (this.state !== 'moving') return
+		if (this.state === 'idle') return
 
 
 		this.position = pos
