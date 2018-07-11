@@ -1,6 +1,6 @@
 
 const obstacles = [
-	// 5
+	11, 12, 13, 14,
 ]
 
 export default obstacles

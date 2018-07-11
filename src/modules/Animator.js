@@ -1,15 +1,25 @@
 import * as PIXI from 'pixi.js'
+import { Tween, Easing } from 'es6-tween'
+
+import pad from '@/utils/pad'
 
 export default class Animator {
-	constructor({ name, speed = 1, frameCount = 26, parent, loopStart = 0, json }) {
+	constructor({
+		name,
+		speed = 500,
+		frameCount = 27,
+		loopStart = 0,
+		reverse = false,
+		repeat = 0,
+	}) {
 
 		this.name = name
 		this.speed = speed
+		this.reverse = reverse
 		this.frameCount = frameCount
-		this.parent = parent
-		this.loopStart = 0
+		this.loopStart = loopStart
 
-		this.json
+		this.repeat = repeat
 
 		this.frames = []
 
@@ -17,31 +27,42 @@ export default class Animator {
 	}
 
 	init() {
-
-		console.log(PIXI.utils.TextureCache)
-
 		for (let i = this.loopStart; i < (this.loopStart + this.frameCount); i++) {
 
-			let val = i < 10
-				? '0' + i
-				: i
+			let textureName = this.name + '_' + pad(i, 4)
 
-			console.log(this.json)
+			let sprite = new PIXI.Sprite(PIXI.loader.resources[this.name].textures[`${textureName}.png`])
 
-			this.frames.push(new PIXI.Sprite(PIXI.loader.resources[this.json].textures[`${this.name}${val}.png`]))
+			this.frames.push( sprite.texture )
 		}
 
-		this.animation = new PIXI.extras.AnimatedSprite(this.frames)
+		this.animation = new PIXI.extras.AnimatedSprite(this.frames, false)
 		this.animation.anchor.set(0, 1)
-		this.animation.speed = this.speed
+
+		let lastFrame = this.reverse
+			? 0
+			: this.frameCount - 1
+
+		this.tween = new Tween({ frame: 0 })
+			.to({ frame: this.frameCount}, this.speed)
+			.on('update', ({ frame }) => {
+				this.animation.gotoAndStop(Math.floor(frame))
+			})
+			.on('complete', ({ frame }) => {
+
+				this.animation.gotoAndStop(lastFrame)
+			})
+			.repeat(this.repeat)
+			.reverse(this.reverse)
+
 	}
 
 	play() {
-		this.animation.play()
+		this.tween.start()
 	}
 
 	stop() {
-		this.animation.stop()
+		this.tween.stop()
 	}
 
 	playing() {

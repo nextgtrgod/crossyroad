@@ -5,6 +5,7 @@ import * as TWEEN from 'es6-tween'
 
 import Map from '@/modules/Map'
 import Character from '@/modules/Character'
+import Bonus from '@/modules/Bonus'
 // import Camera from '@/modules/Camera'
 
 import { assets, pixelRatio } from '@/config/index'
@@ -27,7 +28,7 @@ export default class Render {
 			powerPreference: 'high-performance',
 			autoResize: true,
 			resolution: pixelRatio,
-			backgroundColor: 0xffffff,
+			backgroundColor: 0x242424,
 		})
 
 
@@ -93,9 +94,21 @@ export default class Render {
 		await this.preload()
 		Events.$emit('app-loaded')
 
+		console.log(PIXI.loader.resources)
+
 		// map
 		this.map = new Map()
 		this.container.addChild(this.map.container)
+
+
+		let coin = new Bonus({ type: 'coin' })
+		coin.setPosition(5, 5)
+		this.container.addChild(coin.container)
+
+		let qiwi = new Bonus({ type: 'qiwi' })
+		qiwi.setPosition(6, 2)
+		this.container.addChild(qiwi.container)
+
 
 		// character
 		this.character = new Character()
@@ -110,10 +123,9 @@ export default class Render {
 
 
 		this.container.position.set(
-			300,
-			100
+			400,
+			200
 		)
-
 
 		this.app.ticker.add(this.update, this)
 

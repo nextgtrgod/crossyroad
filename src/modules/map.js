@@ -18,30 +18,30 @@ export default class Map {
 
 	draw() {
 
-		console.log(PIXI.loader.resources)
-		console.log(tiles)
-
 		// drawing map (level 0)
-		for (let i = map.length - 1; i >= 0; i--) {
-			// console.log(i + ' row')
-			for (let j = 0; j < map[i].length; j++) {
+		for (let row = 0; row < map.length; row++) {
 
-				let sprite = new PIXI.Sprite(PIXI.loader.resources['tiles'].textures[ tiles[ map[i][j] ] ])
-				sprite.name = `${i}-${j}`
+			for (let col = 0; col < map[row].length; col++) {
 
-				sprite.anchor.set(0, 1)
+				let cell = map[row][col].split(':')
 
-				let x = j * grid.size.x
-				let y = i * grid.size.y
+				cell.map(tileIndex => {
 
-				let coords = cartToIso(i * grid.size.x, j * grid.size.y)
+					if (!tileIndex) return
 
-				// console.log(x, y, coords)
+					let sprite = new PIXI.Sprite(PIXI.loader.resources['tiles'].textures[ tiles[tileIndex] ])
 
-				sprite.position.x = coords.x
-				sprite.position.y = coords.y
+					sprite.anchor.set(0, 1)
 
-				this.container.addChild(sprite)
+					let coords = cartToIso(row * grid.size.y, col * grid.size.x)
+
+					sprite.position.set(
+						coords.x,
+						coords.y
+					)
+
+					this.container.addChild(sprite)
+				})
 			}
 		}
 	}
